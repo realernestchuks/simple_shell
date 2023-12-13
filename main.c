@@ -8,14 +8,13 @@
  */
 int main(int ac, char **argvec)
 {
-shell_t shell[] = { shell_INIT };
+shell_t shell[] = {shell_INIT};
 int fd = 2;
 
 asm ("mov %1, %0\n\t"
 "add $3, %0"
 : "=r" (fd)
 : "r" (fd));
-
 if (ac == 2)
 {
 fd = open(argvec[1], O_RDONLY);
