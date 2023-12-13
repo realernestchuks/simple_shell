@@ -1,83 +1,94 @@
 #include "shell.h"
 
 /**
- * _strcpy - copies a string
- * @destination: the destination
- * @source: the source
- * Return: pointer to destination
+ * **strtow - splits a string into words. Repeat delimiters are ignored
+ * @str: the input string
+ * @d: the delimeter string
+ * Return: a pointer to an array of strings, or NULL on failure
  */
-char *_strcpy(char *destination, char *source)
-{
-int a = 0;
 
-if (destination == source || source == 0)
-return (destination);
-while (source[a])
+char **strtow(char *str, char *deli)
 {
-destination[a] = source[a];
-a++;
-}
-destination[a] = 0;
-return (destination);
-}
+int a, b, k, m, numwords = 0;
+char **s;
 
-/**
- * _strdup - duplicates a string
- * @str: the string to duplicate
- * Return: pointer to the duplicated string
- */
-char *_strdup(const char *str)
-{
-int length = 0;
-char *ret;
-
-if (str == NULL)
+if (str == NULL || str[0] == 0)
 return (NULL);
-while (*str++)
-length++;
-ret = malloc(sizeof(char) * (length + 1));
-if (!ret)
+if (!deli)
+deli = " ";
+for (a = 0; str[a] != '\0'; a++)
+if (!is_delimeter(str[a], deli) && (is_delimeter(str[a + 1], deli) || !str[a + 1]))
+numwords++;
+
+if (numwords == 0)
 return (NULL);
-for (length++; length--;)
-ret[length] = *--str;
-return (ret);
-}
-
-/**
- * _puts - prints an input string
- * @str: the string to be printed
- * Return: Nothing
- */
-void _puts(char *str)
+s = malloc((1 + numwords) * sizeof(char *));
+if (!s)
+return (NULL);
+for (a = 0, b = 0; b < numwords; b++)
 {
-int a = 0;
-
-if (!str)
-return;
-while (str[a] != '\0')
-{
-_putchar(str[a]);
+while (is_delimeter(str[a], deli))
 a++;
+k = 0;
+while (!is_delimeter(str[a + k], deli) && str[a + k])
+k++;
+s[b] = malloc((k + 1) * sizeof(char));
+if (!s[b])
+{
+for (k = 0; k < b; k++)
+free(s[k]);
+free(s);
+return (NULL);
 }
+for (m = 0; m < k; m++)
+s[b][m] = str[a++];
+s[b][m] = 0;
+}
+s[b] = NULL;
+return (s);
 }
 
 /**
- * _putchar - writes the character c to stdout
- * @ch: The character to print
- * Return: On success 1.
- * On error, -1 is returned, and errno is put appropriately.
+ * **strtow2 - splits a string into words
+ * @str: the input string
+ * @d: the delimeter
+ * Return: a pointer to an array of strings, or NULL on failure
  */
-int _putchar(char ch)
+char **strtow2(char *str, char deli)
 {
-static int a;
-static char buf[WRITE_BUF_SIZE];
+int a, b, k, m, numwords = 0;
+char **s;
 
-if (ch == BUF_FLUSH || a >= WRITE_BUF_SIZE)
+if (str == NULL || str[0] == 0)
+return (NULL);
+for (a = 0; str[a] != '\0'; a++)
+if ((str[a] != deli && str[a + 1] == deli) ||
+    (str[a] != deli && !str[a + 1]) || str[a + 1] == deli)
+numwords++;
+if (numwords == 0)
+return (NULL);
+s = malloc((1 + numwords) * sizeof(char *));
+if (!s)
+return (NULL);
+for (a = 0, b = 0; b < numwords; b++)
 {
-write(1, buf, a);
-a = 0;
+while (str[a] == deli && str[a] != deli)
+a++;
+k = 0;
+while (str[a + k] != deli && str[a + k] && str[a + k] != deli)
+k++;
+s[b] = malloc((k + 1) * sizeof(char));
+if (!s[b])
+{
+for (k = 0; k < b; k++)
+free(s[k]);
+free(s);
+return (NULL);
 }
-if (ch != BUF_FLUSH)
-buf[a++] = ch;
-return (1);
+for (m = 0; m < k; m++)
+s[b][m] = str[a++];
+s[b][m] = 0;
+}
+s[b] = NULL;
+return (s);
 }
